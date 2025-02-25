@@ -11,27 +11,22 @@ class Users::SessionsController < Devise::SessionsController
       status : {
         code: 200, message: 'Logged in successfully',
         data: {
-          user: UserSerializer.new(current_user).serializable_hash[:data]
-          [:attributes]
+          user: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
         }
       }
-    }, status: :OK
+    }, status: :ok
   end
 
   def respond_to_on_destroy
     if request.headers['Authorization'].present?
-      jwt.payload = 
-      JWT.decode(request.headers['Authorization'].split(' ').last,
-      Rails.application.credentials.devise_jwt_secret_key!
-      ).first
-
-      current_user = User.find(jwt_payload['sub'])
+      jwt_payload = JWT.decode(request.headers['Authorization'].split(' ').last, Rails.application.credentials.devise_jwt_secret_key!).first
+      current_user = User.find(jwt_payload['sub'], jti:jwt_payload['jti'])
     end
     
     if current_user 
       render json: {
         status: 200,
-        message: 'Logged out succesfully.'
+        message: 'Logged out successfully.'
       }, status: :OK
     else
       render json: {
