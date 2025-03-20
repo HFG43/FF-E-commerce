@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+require 'pry-byebug'
 
 class Users::RegistrationsController < Devise::RegistrationsController
   include RackSessionsFix
   respond_to :json
  
+  binding.pry ## comand needid for PRY in this file
   private
 
   def respond_with(current_user, _opts = {})
